@@ -15,11 +15,15 @@ import { COLLECTIONS } from "@/constants";
 import { normalizeTimestamps } from "@/lib/firestore-helpers";
 import { Currency, ThemePreference, type User } from "@/types";
 
-/** Opens the Google sign-in popup and ensures a matching Firestore user document exists. */
-export async function signInWithGoogle(): Promise<FirebaseUser> {
+/**
+ * Opens the Google sign-in popup and ensures a matching Firestore user
+ * document exists. Returns both the Firebase user and their profile so the
+ * caller never has to fetch it a second time.
+ */
+export async function signInWithGoogle(): Promise<{ firebaseUser: FirebaseUser; profile: User }> {
   const credential = await signInWithPopup(auth, googleProvider);
-  await ensureUserDocument(credential.user);
-  return credential.user;
+  const profile = await ensureUserDocument(credential.user);
+  return { firebaseUser: credential.user, profile };
 }
 
 export async function signOutUser(): Promise<void> {

@@ -10,7 +10,6 @@ import {
 import { onAuthStateChanged, type User as FirebaseUser } from "firebase/auth";
 import { auth, isFirebaseConfigured } from "@/firebase/config";
 import {
-  ensureUserDocument,
   getUserDocument,
   signInWithGoogle,
   signOutUser,
@@ -60,8 +59,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function signIn() {
     try {
-      const user = await signInWithGoogle();
-      const userProfile = await ensureUserDocument(user);
+      const { firebaseUser: user, profile: userProfile } = await signInWithGoogle();
+      setFirebaseUser(user);
       setProfile(userProfile);
     } catch (error) {
       throw new Error(toFriendlyError(error));

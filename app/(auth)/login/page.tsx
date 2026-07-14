@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Receipt, TrendingDown, ShieldCheck, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { APP_NAME, APP_TAGLINE } from "@/constants";
@@ -14,9 +15,16 @@ const HIGHLIGHTS = [
 ];
 
 export default function LoginPage() {
-  const { signIn } = useAuth();
+  const { signIn, firebaseUser } = useAuth();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (firebaseUser) {
+      router.replace("/dashboard");
+    }
+  }, [firebaseUser, router]);
 
   async function handleSignIn() {
     setLoading(true);
@@ -25,7 +33,6 @@ export default function LoginPage() {
       await signIn();
     } catch (err) {
       setError(err instanceof Error ? err.message : toFriendlyError(err));
-    } finally {
       setLoading(false);
     }
   }
